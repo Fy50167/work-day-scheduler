@@ -1,19 +1,57 @@
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
+
+
+
+
+
+
 $(function () {
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
+
+  // Applying event listeners to save buttons.
+  var calendarEvents = { // Empty object to save the time block events to.
+  };
+
+  var buttons = $('.saveBtn');
+  buttons.each(function() {
+    $(this).on('click', function() {
+      calendarEvents[$(this).parent().attr('id')] = $(this).parent().children().eq(1).val(); // First traverse to the save buttons parent, then go back down to the first child which is the textarea.
+      localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
+    })
+  })
+
+
+
+  // Following code for applying time classes.
+  $('#currentDay').text(dayjs().format('dddd, MMM DD'));
+  var blocks = $('.time-block');
+  var currentTime = dayjs().hour();
+
+  blocks.each(function() {
+    var blockTime = $(this).children().eq(0).text(); // Get the current time from the block.
+    
+    if (blockTime.includes('PM')) { // Converting time to int for comparison with current time.
+      blockTime = Number(blockTime.slice(0, -2));
+      blockTime = blockTime + 12;
+      if (blockTime === 24) { // Special case for 12PM since we shouldn't be adding 12 to it.
+        blockTime = blockTime - 12;
+      };
+    } else {
+      blockTime = Number(blockTime.slice(0,-2));
+    };
+    
+
+    if (currentTime - blockTime === 0) { // Performing time comparisons
+      $(this).addClass('present');
+    } else if (currentTime - blockTime > 0) {
+      $(this).addClass('past');
+    } else {
+      $(this).addClass('future');
+    };
+  });
+
+
   //
   // TODO: Add code to get any user input that was saved in localStorage and set
   // the values of the corresponding textarea elements. HINT: How can the id
