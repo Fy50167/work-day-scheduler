@@ -23,10 +23,19 @@ $(function () {
 
 
 
-  // Following code for applying time classes.
+  // Getting current date.
   $('#currentDay').text(dayjs().format('dddd, MMM DD'));
+  
+  
+  // Following variables for applying time classes.
   var blocks = $('.time-block');
   var currentTime = dayjs().hour();
+  
+  // Following variables for getting local storage.
+  var storedEvents = JSON.parse(localStorage.getItem('calendarEvents'));
+  var eventsKeys = Object.keys(storedEvents);
+
+
 
   blocks.each(function() {
     var blockTime = $(this).children().eq(0).text(); // Get the current time from the block.
@@ -49,13 +58,11 @@ $(function () {
     } else {
       $(this).addClass('future');
     };
+
+    if (eventsKeys.includes($(this).attr('id'))) { // Check if the id of block is an existing key in local storage, and if so change textarea value to be equal to value of that key.
+      $(this).children().eq(1).val(storedEvents[$(this).attr('id')]);
+    };
+  
   });
-
-
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
+  
 });
